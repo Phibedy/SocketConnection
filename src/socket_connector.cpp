@@ -50,6 +50,10 @@ void SocketConnector::setSocketListener(SocketListener *listener){
     this->listener = listener;
 }
 
+SocketListener* SocketConnector::getSocketListener(){
+    return listener;
+}
+
 
 void SocketConnector::close(){
     setConnected(false);

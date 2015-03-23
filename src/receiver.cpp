@@ -38,7 +38,6 @@ bool Receiver::receivedMessage(int bytesRead){
         currentBufferIndex -= bytesForSize+size;
         return true;
     }
-
 }
 
 
