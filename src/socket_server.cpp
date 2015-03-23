@@ -33,12 +33,6 @@ SocketServer::SocketServer(lms::logging::Logger *parentLogger):logger("SocketSer
 void SocketServer::start(int port) {
     //set default values
     SocketServer::port = port;
-    struct sockaddr_in temp;
-    adress_length = sizeof(temp);
-    setFileDescriptor(0);
-    bzero(&timeout,sizeof(timeout));
-
-	struct sockaddr_in serv_addr;
 	/*
 	 *creates a new socket (TCP as SOCK_STREAM is used)
 	 */
@@ -53,20 +47,16 @@ void SocketServer::start(int port) {
 			sizeof(opt)) < 0) {
 		perror("setsockopt");
 		exit (EXIT_FAILURE);
-	}
-	/*
-	 * set server_addr to zero
-	 */
-	bzero((char *) &serv_addr, sizeof(serv_addr));
+    }
 	/**
 	 * set struct values for creating the socket
-	 */
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
+     */
+    socket_addr.sin_family = AF_INET;
+    socket_addr.sin_addr.s_addr = INADDR_ANY;
 	/*convert port numbers*/
-	serv_addr.sin_port = htons(port);
+    socket_addr.sin_port = htons(port);
 	/*bind port to socket */
-    if (bind(getFileDescriptor(), (struct sockaddr *) &serv_addr, adress_length) < 0){
+    if (bind(getFileDescriptor(), (struct sockaddr *) &socket_addr, adress_length) < 0){
         logger.error("start") <<"failed to bin port " <<strerror(errno);
     }
 	printf("Listener on port %d \n", port);
@@ -117,10 +107,11 @@ void SocketServer::checkNewConnections() {
         SocketConnector newClient;
 
         newClient.setFileDescriptor(accept(getFileDescriptor(),
-                (struct sockaddr *) &newClient.socket_addr, &adress_length));
+                (struct sockaddr *) &newClient.socket_addr, &newClient.adress_length));
         if (newClient.getFileDescriptor() < 0) {
             logger.error("new Connection") << "failed accept";
 		}
+        newClient.setConnected(true);
 		addClient(newClient);
         logger.info("new Connection") <<"client connected";
 	}
@@ -140,17 +131,21 @@ void SocketServer::checkNewMessages(){
 			} else {
                 logger.info("check messages")<<"Server received message:" << buffer;
                 //TODO listener
-				char ans[] = "Got your message";
+                char ans[] = "Got your message";
                 client.sendMessage(ans,sizeof(ans));
 			}
 		}
 	}
 }
 
-void SocketServer::addClient(const SocketConnector &client) {
+void SocketServer::addClient(SocketConnector &client) {
 	clients.push_back(client);
-//	char ans[] = "You can now talk to your master (server)";
-//	sendMessageToClient(client, ans, sizeof(ans));
+    if(getSocketListener() != nullptr){
+        getSocketListener()->connected(client);
+    }
+    char msg[] = "Ene mene muh da hast dich registriert du kuh";
+    //client.sendMessage(msg,sizeof(msg));
+    //Maybe send welcome-message
 }
 
 void SocketServer::sendMessageToAllClients(const void *buffer, int bytesToSend){

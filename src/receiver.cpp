@@ -48,3 +48,11 @@ char * Receiver::getReadStart(){
 int Receiver::getLastReadCount(){
     return lastRead;
 }
+
+int Receiver::getBytesForSize(){
+    return bytesForSize;
+}
+
+void Receiver::setBytesForSize(int size){
+    this->bytesForSize = size;
+}

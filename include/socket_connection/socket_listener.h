@@ -12,6 +12,8 @@ public:
 
     virtual void disconnected(SocketConnector &disconnected) = 0;
 
+    virtual void connected(SocketConnector &connected) = 0;
+
 };
 
 #endif /*SOCKET_CLIENT_LISTENER_H */

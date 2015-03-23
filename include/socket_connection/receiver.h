@@ -39,6 +39,12 @@ public:
 
     char * getReadStart();
     int getLastReadCount();
+    int getBytesForSize();
+    /**
+     * @brief setBytesForSize can't be bigger then 4!
+     * @param size
+     */
+    void setBytesForSize(int size);
 
 };
 #endif /*RECEIVER_H */

@@ -20,30 +20,41 @@ void SocketClient::error(const char *msg) {
 }
 
 void SocketClient::connectToServer(std::string address, int port){
-    //TODO why can't I use connector()????
-    SocketConnector connector;
-	struct sockaddr_in serv_addr;
+    //setup host
     struct hostent *hostent;
-    connector.address = address;
-    connector.port = port;
-    connector.setFileDescriptor(socket(AF_INET, SOCK_STREAM, 0));
-    if (connector.getFileDescriptor() < 0)
-		error("ERROR opening socket\n");
     hostent = gethostbyname(address.c_str());
     if (hostent == NULL) {
-		fprintf(stderr, "ERROR, no such host\n");
-		exit(0);
-	}
-	bzero((char *) &serv_addr, sizeof(serv_addr));
-	serv_addr.sin_family = AF_INET;
-    bcopy((char *) hostent->h_addr, (char *) &serv_addr.sin_addr.s_addr,
+        fprintf(stderr, "ERROR, no such host\n");
+        exit(0);
+    }
+
+    //setup server
+    //TODO why can't I use connector()?
+    SocketConnector server;
+    //zero it, it should be already zero
+    bzero(&server.socket_addr, sizeof(server.socket_addr));
+    //data just for the user
+    server.address = address;
+    server.port = port;
+    //create file descriptor
+    server.setFileDescriptor(socket(AF_INET, SOCK_STREAM, 0));
+    if (server.getFileDescriptor() < 0)
+		error("ERROR opening socket\n");
+    //set socket_addr
+    server.socket_addr.sin_family = AF_INET;
+    bcopy((char *) hostent->h_addr, (char *) &server.socket_addr.sin_addr.s_addr,
             hostent->h_length);
-	serv_addr.sin_port = htons(port);
-    if (connect(connector.getFileDescriptor(), (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-		error("ERROR connecting\n");
-    printf("client connected to server\n");
-    connector.setConnected(true);
-    servers.push_back(connector);
+    server.socket_addr.sin_port = htons(port);
+    //connect to server
+    if (connect(server.getFileDescriptor(), (struct sockaddr *) &(server.socket_addr), server.adress_length) < 0){
+        error("ERROR connecting\n");
+    }
+    server.setConnected(true);
+    servers.push_back(server);
+    //send debug message to server
+    logger.info("client connected to server\n");
+    char tmp[] = "hi server";
+    server.sendMessage(tmp, sizeof(tmp));
 }
 
 void SocketClient::cycleClient(){
@@ -60,6 +71,7 @@ bool SocketClient::listenToFiles() {
         SocketConnector &server = *it;
         //if valid socket descriptor then add to read list
         if (server.getFileDescriptor() > 0) {
+            //add the filedescriptor for the given server
             FD_SET(server.getFileDescriptor(), &fds);
             if(server.getFileDescriptor() > max_fd){
                 max_fd = server.getFileDescriptor();
@@ -74,6 +86,9 @@ bool SocketClient::listenToFiles() {
             }
         }
     }
+    //TODO zero timeout just for debug
+    bzero(&timeout,sizeof(timeout));
+
     return select(max_fd+1, &fds, NULL, NULL, &timeout) > 0;
 }
 void SocketClient::checkNewMessages(){
@@ -88,7 +103,10 @@ void SocketClient::checkNewMessages(){
             n = read(server.getFileDescriptor(), server.getReceiver().getReadBuffer(), 256);
             if (n <= 0) {
                 //Server closed connection
-                printf("server disconnected \n");
+                perror("server disconnected \n");
+                logger.error("fauled") << n;
+                char tmp[] = "Do you still get this server?";
+                server.sendMessage(tmp, sizeof(tmp));
                 server.setConnected(false);
                 //it = servers.erase(it) - 1;
             } else {

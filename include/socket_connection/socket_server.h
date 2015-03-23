@@ -29,7 +29,7 @@ private:
 public:
 
     void start(int port);
-    void addClient(const SocketConnector &client);
+    void addClient(SocketConnector &client);
     void sendMessageToAllClients(const void *buffer, int bytesToSend);
 	void cycle();
     void dispose();

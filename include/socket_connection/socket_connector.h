@@ -24,10 +24,6 @@ class SocketConnector{
     int fileDescriptor;
 
 protected:
-    /**
-     * stores the size of the address of the client, used to accept calls
-     */
-    socklen_t adress_length;
 
     timeval timeout;
     /**
@@ -36,15 +32,18 @@ protected:
     fd_set fds;
 
     SocketListener *listener;
-
 public:
+    struct sockaddr_in socket_addr;
+    /**
+     * stores the size of the address of the client, used to accept calls
+     */
+    socklen_t adress_length;
+
     SocketConnector();
     /** Just for later handling, not required by the system*/
     std::string address;
     /** Just for later handling, not required by the system*/
     int port;
-    //TODO not sure if that is really needed for all clients
-    struct sockaddr_in socket_addr;
 
     bool isConnected();
     void setConnected(bool state);
@@ -66,7 +65,7 @@ public:
      * @param bytesToSend
      * @return
      */
-    bool sendMessage(const void *buffer, int bytesToSend);
+    bool sendMessage(const void *buffer, int bytesToSend,bool addSize = false);
     void setSocketListener(SocketListener *listener);
     SocketListener *getSocketListener();
 

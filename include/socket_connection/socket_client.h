@@ -11,14 +11,11 @@ class SocketClient:public SocketConnector {
 public:
     SocketClient(lms::logging::Logger *parentLogger);
 private:
+
     lms::logging::ChildLogger logger;
     std::vector<SocketConnector> servers;
     SocketListener* listener;
 
-	/**
-	 * defined in netinet/in.h
-	 */
-	struct sockaddr_in serv_addr;
     bool listenToFiles();
 	void checkNewMessages();
 	void error(const char *msg);
