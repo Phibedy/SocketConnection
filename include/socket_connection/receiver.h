@@ -1,7 +1,6 @@
 #ifndef RECEIVER_H
 #define RECEIVER_H
 
-#include "socket_clientListener.h"
 #include <sys/types.h>
 #include <string.h>
 #include <stdio.h>
@@ -16,6 +15,7 @@ class Receiver {
     char *buffer;
     int bufferSize;
     int currentBufferIndex;
+    int lastRead;
 
 public:
     Receiver();
@@ -30,12 +30,15 @@ public:
      * @brief receivedMessage call this method if new bytes were read into the buffer
      * @param bytesRead
      */
-    void receivedMessage(int bytesRead,void (*listener)(char *, int));
+    bool receivedMessage(int bytesRead);
 
     void setBuffer(char *buffer, int size){
         this->buffer = buffer;
         this->bufferSize = size;
     }
+
+    char * getReadStart();
+    int getLastReadCount();
 
 };
 #endif /*RECEIVER_H */

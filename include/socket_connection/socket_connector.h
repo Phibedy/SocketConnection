@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <vector>
 #include <sys/select.h>
+#include <socket_connection/socket_listener.h>
 
 class SocketConnector{
     bool connected;
@@ -33,6 +34,8 @@ protected:
      * file descriptor set
      */
     fd_set fds;
+
+    SocketListener *listener;
 
 public:
     SocketConnector();
@@ -64,7 +67,9 @@ public:
      * @return
      */
     bool sendMessage(const void *buffer, int bytesToSend);
+    void setSocketListener(SocketListener *listener);
+    SocketListener *getSocketListener();
 
 };
 
-#endif SOCKET_CONNECTOR_H
+#endif /* SOCKET_CONNECTOR_H */

@@ -66,9 +66,12 @@ bool SocketClient::listenToFiles() {
             }
         } else {
             //remove invalid client
-            printf("invalid server!!!!");
+            logger.info("listenToFiles") <<"invalid server file";
             server.setConnected(false);
-            //it = server.erase(it) - 1;
+            //not sure if that method should be called
+            if(getSocketListener() != nullptr){
+                getSocketListener()->disconnected(server);
+            }
         }
     }
     return select(max_fd+1, &fds, NULL, NULL, &timeout) > 0;
@@ -78,6 +81,9 @@ void SocketClient::checkNewMessages(){
     for (std::vector<SocketConnector>::iterator it = servers.begin();
             it != servers.end(); ++it) {
         SocketConnector & server = *it;
+        if(!server.isConnected()){
+            continue;
+        }
         if (FD_ISSET(server.getFileDescriptor(), &fds)) {
             n = read(server.getFileDescriptor(), server.getReceiver().getReadBuffer(), 256);
             if (n <= 0) {
@@ -86,7 +92,11 @@ void SocketClient::checkNewMessages(){
                 server.setConnected(false);
                 //it = servers.erase(it) - 1;
             } else {
-                //TODO server.getReceiver().receivedMessage();
+                if(getSocketListener() != nullptr){
+                    while(server.getReceiver().receivedMessage(n)){
+                        getSocketListener()->receivedMessage(server,server.getReceiver().getReadStart(),server.getReceiver().getLastReadCount());
+                    }
+                }
                 logger.debug("check messages") <<"Client received message";
             }
         }

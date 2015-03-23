@@ -1,5 +1,5 @@
 #include <socket_connection/receiver.h>
-Receiver::Receiver():bytesForSize(4){
+Receiver::Receiver():bytesForSize(4),lastRead(0){
 }
 
 
@@ -7,10 +7,13 @@ char* Receiver::getReadBuffer(){
     return &buffer[currentBufferIndex];
 }
 
-void Receiver::receivedMessage(int bytesRead,void (*listener)(char *, int)){
+bool Receiver::receivedMessage(int bytesRead){
     //number of bytes available atm
     if(bytesForSize == 0){
-        listener(buffer,currentBufferIndex+bytesRead);
+        if(bytesRead > 0){
+            lastRead = bytesRead;
+            return true;
+        }
     }
     int totalBytes = currentBufferIndex+bytesRead;
     /*
@@ -27,12 +30,22 @@ void Receiver::receivedMessage(int bytesRead,void (*listener)(char *, int)){
         if(size > bytesRead-bytesForSize){
             //packet doesn't fit, wait for more data
             currentBufferIndex = totalBytes;
-            return;
+            return false;
         }
         //throw event
-        listener(&buffer[bytesForSize], size);
+        lastRead = size;
         //one complete object was read, decrease the bufferIndex
         currentBufferIndex -= bytesForSize+size;
+        return true;
     }
 
+}
+
+
+char * Receiver::getReadStart(){
+    return &buffer[bytesForSize];
+}
+
+int Receiver::getLastReadCount(){
+    return lastRead;
 }

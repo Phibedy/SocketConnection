@@ -9,6 +9,7 @@ set ( HEADERS
         "include/socket_connection/socket_server.h"
 	"include/socket_connection/socket_connector.h"
 	"include/socket_connection/receiver.h"
+	"include/socket_connection/socket_listener.h"
 )
 
 add_library ( socket_connection SHARED ${SOURCE} ${HEADERS})

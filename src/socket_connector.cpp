@@ -2,7 +2,8 @@
 #include <string>
 #include <arpa/inet.h>    //close
 
-SocketConnector::SocketConnector():fileDescriptor(0),connected(false),address(""),port(0){
+SocketConnector::SocketConnector():connected(false),
+    fileDescriptor(0),listener(nullptr),address(""),port(0){
     bzero(&timeout,sizeof(timeout));
 }
 
@@ -33,16 +34,24 @@ bool SocketConnector::sendMessage(const void *buffer, int bytesToSend) {
         int n = write(fileDescriptor, buffer, bytesToSend);
         if (n < 0) {
             perror("sendMessage\n");
+            return false;
+        }else{
+            return true;
         }
     }else{
         //fucked again
         perror("not connected (sendMessage)\n");
+        return false;
     }
+
+}
+
+void SocketConnector::setSocketListener(SocketListener *listener){
+    this->listener = listener;
 }
 
 
 void SocketConnector::close(){
     setConnected(false);
     //close(getFileDescriptor());
-
 }

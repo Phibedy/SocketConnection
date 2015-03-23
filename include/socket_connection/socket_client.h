@@ -1,6 +1,5 @@
 #ifndef SOCKET_CLIENT_H
 #define SOCKET_CLIENT_H
-#include "socket_clientListener.h"
 #include <aio.h>
 #include <netinet/in.h>
 #include <vector>
@@ -14,7 +13,7 @@ public:
 private:
     lms::logging::ChildLogger logger;
     std::vector<SocketConnector> servers;
-	SocketClientListener* listener;
+    SocketListener* listener;
 
 	/**
 	 * defined in netinet/in.h
