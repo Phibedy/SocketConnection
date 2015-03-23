@@ -1,54 +1,33 @@
 #ifndef SOCKET_CLIENT_H
 #define SOCKET_CLIENT_H
-#include "SocketClientListener.h"
+#include "socket_clientListener.h"
 #include <aio.h>
 #include <netinet/in.h>
-class SocketClient {
-
-#define BUFFER_SIZE 1000*100
+#include <vector>
+#include <string>
+#include <lms/logger.h>
+#include <socket_connection/socket_connector.h>
+class SocketClient:public SocketConnector {
 
 public:
-	SocketClient(SocketClientListener* listener);
-    char buffer[BUFFER_SIZE];
-
-
+    SocketClient(lms::logging::Logger *parentLogger);
 private:
-
-	/**
-	 * file descriptor
-	 */
-	int sockfd;
-	fd_set fds;
-	bool connected;
-
-    timeval timeout;
-	/**
-	*
-	*/
+    lms::logging::ChildLogger logger;
+    std::vector<SocketConnector> servers;
 	SocketClientListener* listener;
-	/**
-	 * port of the server
-	 */
-	int port;
-
-	/**
-	 * stores the size of the address of the client, used to accept calls
-	 */
-	socklen_t adress_length;
 
 	/**
 	 * defined in netinet/in.h
 	 */
 	struct sockaddr_in serv_addr;
-	void listenToFiles();
+    bool listenToFiles();
 	void checkNewMessages();
 	void error(const char *msg);
 
 public:
 
-	void connectToServer(char* address,int port);
-	void cycle();
-    void sendMessage(int sockfd,const void *buffer, int bytesToSend);
+    void connectToServer(std::string address,int port);
+    void cycleClient();
     /**
      * @brief sendMessage Die Reihenfolge ist wichtig von pointers und sizeOfObjects pointers[i] <-> sizeOfObjects[i]
      * @param sockfd file descriptor
@@ -58,11 +37,6 @@ public:
      */
    // void sendMessage(int sockfd,int* pointers, int*sizeOfObjects, int numberOfObjects);
 	void sendMessage(const void *buffer, int bytesToSend);
-
-    /**
-     * @brief index_of_buffer, first free byte in the buffer
-     */
-    int index_of_buffer;
 };
 
 #endif /*SOCKET_CLIENT_H */
