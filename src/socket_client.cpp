@@ -62,6 +62,26 @@ void SocketClient::cycleClient(){
         checkNewMessages();
     }
 }
+
+bool SocketClient::listenToFiles(){
+    FD_ZERO(&fds);
+    FD_SET(getFileDescriptor(), &fds);
+
+    return select(getFileDescriptor() +1, &fds, NULL, NULL, &timeout) > 0;
+}
+void SocketClient::checkNewMessages(){
+    int n;
+    if (FD_ISSET(getFileDescriptor(), &fds)) {
+        char tmp[1000];
+            n = read(getFileDescriptor(), &tmp,1000);
+            if (n <= 0) {
+                //No new messages from server
+            } else {
+                logger.info("got msg");
+            }
+        }
+}
+/*
 bool SocketClient::listenToFiles() {
     int max_fd = 0;
     FD_ZERO(&fds);
@@ -120,3 +140,27 @@ void SocketClient::checkNewMessages(){
         }
     }
 }
+
+
+void SocketClient::connectToServer(std::string address, int port){
+    struct sockaddr_in serv_addr;
+    struct hostent *server;
+
+    setFileDescriptor(socket(AF_INET, SOCK_STREAM, 0));
+    if (getFileDescriptor() < 0)
+        error("ERROR opening socket\n");
+    server = gethostbyname(address.c_str());
+    if (server == NULL) {
+        fprintf(stderr, "ERROR, no such host\n");
+        exit(0);
+    }
+    bzero((char *) &serv_addr, sizeof(socket_addr));
+    serv_addr.sin_family = AF_INET;
+    bcopy((char *) server->h_addr, (char *) &socket_addr.sin_addr.s_addr,
+            server->h_length);
+    serv_addr.sin_port = htons(port);
+    if (connect(getFileDescriptor(), (struct sockaddr *) &socket_addr, sizeof(socket_addr)) < 0)
+        error("ERROR connecting\n");
+}
+
+*/

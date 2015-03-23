@@ -144,7 +144,7 @@ void SocketServer::addClient(SocketConnector &client) {
         getSocketListener()->connected(client);
     }
     char msg[] = "Ene mene muh da hast dich registriert du kuh";
-    //client.sendMessage(msg,sizeof(msg));
+    client.sendMessage(msg,sizeof(msg));
     //Maybe send welcome-message
 }
 
