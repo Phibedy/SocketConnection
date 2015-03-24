@@ -49,10 +49,19 @@ int Receiver::getLastReadCount(){
     return lastRead;
 }
 
+void Receiver::setBuffer(char *buffer, int size){
+    this->buffer = buffer;
+    this->bufferSize = size;
+}
+
 int Receiver::getBytesForSize(){
     return bytesForSize;
 }
 
 void Receiver::setBytesForSize(int size){
     this->bytesForSize = size;
+}
+
+int Receiver::getBufferSpace(){
+    return bufferSize-currentBufferIndex;
 }

@@ -9,7 +9,7 @@ class SocketServer:public SocketConnector {
 
 public:
     SocketServer(lms::logging::Logger *parentLogger);
-    char buffer[1000*100];
+    //char buffer[1000*100];
 
 private:
 
@@ -23,16 +23,35 @@ private:
      * @return
      */
     bool listenToFiles();
+    /**
+     * @brief checkNewConnections checks new incoming if listenToFiles returned true
+     */
 	void checkNewConnections();
+    /**
+     * @brief checkNewMessages checks if new messages are available if listenToFiles returned true, called after checkNewConnections
+     */
     void checkNewMessages();
-
-public:
-
-    void start(int port);
+    /**
+     * @brief addClient adds a client
+     * @param client
+     */
     void addClient(SocketConnector &client);
+public:
+    /**
+     * @brief start opens the port
+     * TODO My be moved to the constructor
+     * @param port
+     */
+    void start(int port);
     void sendMessageToAllClients(const void *buffer, int bytesToSend);
-	void cycle();
-    void dispose();
+    /**
+     * @brief cycle call this method to check for new clients and messages
+     */
+    void cycle();
+    /**
+     * @brief close closes the server and all related connections
+     */
+    void close();
 };
 
 #endif /*SOCKET_SERVER_H */

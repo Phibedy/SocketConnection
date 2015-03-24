@@ -6,12 +6,25 @@ class SocketConnector;
 class SocketListener {
 
 public:
+    SocketListener(){}
     virtual ~SocketListener() {}
-
+    /**
+     * @brief receivedMessage called if a message was received
+     * @param from
+     * @param buff
+     * @param bytesRead
+     */
     virtual void receivedMessage(SocketConnector &from, char* buff, int bytesRead)=0;
-
+    /**
+     * @brief disconnected called if connection was closed
+     * @param disconnected
+     */
     virtual void disconnected(SocketConnector &disconnected) = 0;
 
+    /**
+     * @brief connected called if a connection was established
+     * @param connected
+     */
     virtual void connected(SocketConnector &connected) = 0;
 
 };

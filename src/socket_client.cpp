@@ -14,20 +14,14 @@ SocketClient::SocketClient(lms::logging::Logger *parentLogger):logger("SocketCli
     SocketClient::listener = nullptr;
 }
 
-void SocketClient::error(const char *msg) {
-	perror(msg);
-	exit(0);
-}
-
-void SocketClient::connectToServer(std::string address, int port){
+bool SocketClient::connectToServer(std::string address, int port){
     //setup host
     struct hostent *hostent;
     hostent = gethostbyname(address.c_str());
     if (hostent == NULL) {
-        fprintf(stderr, "ERROR, no such host\n");
-        exit(0);
+        logger.perror("connect to server") << "ERROR, no such host";
+        return false;
     }
-
     //setup server
     //TODO why can't I use connector()?
     SocketConnector server;
@@ -39,7 +33,7 @@ void SocketClient::connectToServer(std::string address, int port){
     //create file descriptor
     server.setFileDescriptor(socket(AF_INET, SOCK_STREAM, 0));
     if (server.getFileDescriptor() < 0)
-		error("ERROR opening socket\n");
+        logger.perror("connect to server")<<"ERROR opening socket";
     //set socket_addr
     server.socket_addr.sin_family = AF_INET;
     bcopy((char *) hostent->h_addr, (char *) &server.socket_addr.sin_addr.s_addr,
@@ -47,14 +41,14 @@ void SocketClient::connectToServer(std::string address, int port){
     server.socket_addr.sin_port = htons(port);
     //connect to server
     if (connect(server.getFileDescriptor(), (struct sockaddr *) &(server.socket_addr), server.adress_length) < 0){
-        error("ERROR connecting\n");
+        logger.perror("ERROR connecting");
+        return false;
     }
     server.setConnected(true);
     servers.push_back(server);
     //send debug message to server
-    logger.info("client connected to server\n");
-    char tmp[] = "hi server";
-    server.sendMessage(tmp, sizeof(tmp));
+    logger.debug("client connected to server\n");
+    return true;
 }
 
 void SocketClient::cycleClient(){
@@ -63,25 +57,33 @@ void SocketClient::cycleClient(){
     }
 }
 
-bool SocketClient::listenToFiles(){
-    FD_ZERO(&fds);
-    FD_SET(getFileDescriptor(), &fds);
-
-    return select(getFileDescriptor() +1, &fds, NULL, NULL, &timeout) > 0;
-}
 void SocketClient::checkNewMessages(){
-    int n;
-    if (FD_ISSET(getFileDescriptor(), &fds)) {
-        char tmp[1000];
-            n = read(getFileDescriptor(), &tmp,1000);
+    int n = 0;
+    for (std::vector<SocketConnector>::iterator it = servers.begin();
+            it != servers.end(); ++it) {
+        SocketConnector & server = *it;
+        if(!server.isConnected()){
+            continue;
+        }
+        if (FD_ISSET(server.getFileDescriptor(), &fds)) {
+
+            n = read(server.getFileDescriptor(), server.getReceiver().getReadBuffer(), 256);
             if (n <= 0) {
-                //No new messages from server
+                //Server closed connection
+                logger.perror("checkNewMessages: ") << n;
+                //it = servers.erase(it) - 1;
             } else {
-                logger.info("got msg");
+                if(getSocketListener() != nullptr){
+                    while(server.getReceiver().receivedMessage(n)){
+                        getSocketListener()->receivedMessage(server,server.getReceiver().getReadStart(),server.getReceiver().getLastReadCount());
+                    }
+                }
+                logger.debug("check messages") <<"Client received message";
             }
         }
+    }
 }
-/*
+
 bool SocketClient::listenToFiles() {
     int max_fd = 0;
     FD_ZERO(&fds);
@@ -111,56 +113,3 @@ bool SocketClient::listenToFiles() {
 
     return select(max_fd+1, &fds, NULL, NULL, &timeout) > 0;
 }
-void SocketClient::checkNewMessages(){
-    int n = 0;
-    for (std::vector<SocketConnector>::iterator it = servers.begin();
-            it != servers.end(); ++it) {
-        SocketConnector & server = *it;
-        if(!server.isConnected()){
-            continue;
-        }
-        if (FD_ISSET(server.getFileDescriptor(), &fds)) {
-            n = read(server.getFileDescriptor(), server.getReceiver().getReadBuffer(), 256);
-            if (n <= 0) {
-                //Server closed connection
-                perror("server disconnected \n");
-                logger.error("fauled") << n;
-                char tmp[] = "Do you still get this server?";
-                server.sendMessage(tmp, sizeof(tmp));
-                server.setConnected(false);
-                //it = servers.erase(it) - 1;
-            } else {
-                if(getSocketListener() != nullptr){
-                    while(server.getReceiver().receivedMessage(n)){
-                        getSocketListener()->receivedMessage(server,server.getReceiver().getReadStart(),server.getReceiver().getLastReadCount());
-                    }
-                }
-                logger.debug("check messages") <<"Client received message";
-            }
-        }
-    }
-}
-
-
-void SocketClient::connectToServer(std::string address, int port){
-    struct sockaddr_in serv_addr;
-    struct hostent *server;
-
-    setFileDescriptor(socket(AF_INET, SOCK_STREAM, 0));
-    if (getFileDescriptor() < 0)
-        error("ERROR opening socket\n");
-    server = gethostbyname(address.c_str());
-    if (server == NULL) {
-        fprintf(stderr, "ERROR, no such host\n");
-        exit(0);
-    }
-    bzero((char *) &serv_addr, sizeof(socket_addr));
-    serv_addr.sin_family = AF_INET;
-    bcopy((char *) server->h_addr, (char *) &socket_addr.sin_addr.s_addr,
-            server->h_length);
-    serv_addr.sin_port = htons(port);
-    if (connect(getFileDescriptor(), (struct sockaddr *) &socket_addr, sizeof(socket_addr)) < 0)
-        error("ERROR connecting\n");
-}
-
-*/

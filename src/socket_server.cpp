@@ -123,16 +123,16 @@ void SocketServer::checkNewMessages(){
 			it != clients.end(); ++it) {
         SocketConnector &client = *it;
         if (FD_ISSET(client.getFileDescriptor(), &fds)) {
-            n = read(client.getFileDescriptor(), buffer, 256);
+            n = read(client.getFileDescriptor(), client.getReceiver().getReadBuffer(), client.getReceiver().getBufferSpace());
 			if (n <= 0) {
                 //Somebody disconnected, remove client
                 logger.info("check messages") << "client disconnected";
 				it = clients.erase(it) - 1;
 			} else {
-                logger.info("check messages")<<"Server received message:" << buffer;
+                logger.info("check messages")<<"Server received message:" << client.getReceiver().getReadStart();
                 //TODO listener
                 char ans[] = "Got your message";
-                client.sendMessage(ans,sizeof(ans));
+                client.sendMessage(ans,sizeof(ans),true);
 			}
 		}
 	}

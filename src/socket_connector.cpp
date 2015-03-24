@@ -2,7 +2,7 @@
 #include <string>
 #include <arpa/inet.h>    //close
 
-SocketConnector::SocketConnector():connected(false),
+SocketConnector::SocketConnector(int bufferSize):connected(false),bufferSize(bufferSize),
     fileDescriptor(0),listener(nullptr),address(""),port(0){
     /*
      * set server_addr to zero
@@ -11,6 +11,7 @@ SocketConnector::SocketConnector():connected(false),
 
     adress_length = sizeof(socket_addr);
     bzero(&timeout,sizeof(timeout));
+    receiver.setBuffer(new char[bufferSize], bufferSize);
 }
 
 Receiver SocketConnector::getReceiver(){

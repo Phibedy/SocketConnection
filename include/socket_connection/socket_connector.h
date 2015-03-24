@@ -16,15 +16,20 @@
 #include <vector>
 #include <sys/select.h>
 #include <socket_connection/socket_listener.h>
-
+/**
+ * @brief The SocketConnector class A class that holds basic unix stuff for socket-connection
+ */
 class SocketConnector{
     bool connected;
     Receiver receiver;
 
+    int bufferSize;
     int fileDescriptor;
 
 protected:
-
+    /**
+     * @brief timeout the timeout for the connection, by default zero
+     */
     timeval timeout;
     /**
      * file descriptor set
@@ -38,21 +43,46 @@ public:
      * stores the size of the address of the client, used to accept calls
      */
     socklen_t adress_length;
-
-    SocketConnector();
+    /**
+     * @brief SocketConnector
+     * @param buffersize by default 1024
+     */
+    SocketConnector(int buffersize = 1024);
     /** Just for later handling, not required by the system*/
     std::string address;
     /** Just for later handling, not required by the system*/
     int port;
 
+    /**
+     * @brief isConnected
+     * @return true if the connection is established
+     */
     bool isConnected();
+    /**
+     * @brief setConnected call this method if the connection was established or cut
+     * @param state
+     */
     void setConnected(bool state);
+    /**
+     * @brief getReceiver the buffer-wrapper to receive messages
+     * @return
+     */
     Receiver getReceiver();
 
+    /**
+     * @brief setFileDescriptor used to receive and send messages
+     * @param f
+     */
     void setFileDescriptor(int f);
-
+    /**
+     * @brief close closes the File Descriptor
+     */
     void close();
 
+    /**
+     * @brief getFileDescriptor used to receive and send messages
+     * @return
+     */
     int getFileDescriptor();
 
     friend bool operator==(const SocketConnector& lhs, const SocketConnector& rhs){
@@ -66,7 +96,15 @@ public:
      * @return
      */
     bool sendMessage(const void *buffer, int bytesToSend,bool addSize = false);
+    /**
+     * @brief setSocketListener listener that is called by SocketClient and SocketServer on events
+     * @param listener
+     */
     void setSocketListener(SocketListener *listener);
+    /**
+     * @brief getSocketListener listener that is called by SocketClient and SocketServer on events
+     * @return
+     */
     SocketListener *getSocketListener();
 
 };

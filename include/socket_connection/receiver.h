@@ -32,12 +32,21 @@ public:
      */
     bool receivedMessage(int bytesRead);
 
-    void setBuffer(char *buffer, int size){
-        this->buffer = buffer;
-        this->bufferSize = size;
-    }
-
+    /**
+     * @brief setBuffer set the buffer used to receive messages
+     * @param buffer
+     * @param size
+     */
+    void setBuffer(char *buffer, int size);
+    /**
+     * @brief getReadStart used to read the data that was collected by the buffer
+     * @return
+     */
     char * getReadStart();
+    /**
+     * @brief getLastReadCount
+     * @return number of bytes that were collected during the last run or of an complete object
+     */
     int getLastReadCount();
     int getBytesForSize();
     /**
@@ -45,6 +54,8 @@ public:
      * @param size
      */
     void setBytesForSize(int size);
+    int getBufferSpace();
+
 
 };
 #endif /*RECEIVER_H */
