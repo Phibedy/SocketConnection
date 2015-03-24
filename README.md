@@ -1,6 +1,6 @@
 # SocketConnection
 
-Basic socketLib for [LMS](https://github.com/Phibedy/LMS)
+Basic socket-wrapper for [LMS](https://github.com/Phibedy/LMS)
 
 ###Overview
  * It's an easy to use socket-wrapper. It contains a server and a client. <br>
