@@ -154,7 +154,7 @@ void SocketServer::sendMessageToAllClients(const void *buffer, int bytesToSend){
     }
 }
 
-void SocketServer::dispose(){
+void SocketServer::close(){
     //TODO: send bye-message to clients
     close();
     for(auto &client:clients){
