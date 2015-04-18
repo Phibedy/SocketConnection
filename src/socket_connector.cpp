@@ -2,6 +2,7 @@
 #include <string>
 #include <arpa/inet.h>    //close
 
+namespace socket_connection{
 SocketConnector::SocketConnector(int bufferSize):connected(false),bufferSize(bufferSize),
     fileDescriptor(0),listener(nullptr),address(""),port(0){
     /*
@@ -40,6 +41,7 @@ bool SocketConnector::sendMessage(const void *buffer, int bytesToSend, bool addS
     if(isConnected()){
         int n = 0;
         if(addSize && receiver.getBytesForSize() > 0){
+            std::cout<< "SIZE I WANT TO SEND: " << bytesToSend << std::endl;
             std::uint32_t size = bytesToSend;
             n = write(fileDescriptor, &size, receiver.getBytesForSize());
         }
@@ -70,4 +72,5 @@ SocketListener* SocketConnector::getSocketListener(){
 void SocketConnector::close(){
     setConnected(false);
     //close(getFileDescriptor());
+}
 }

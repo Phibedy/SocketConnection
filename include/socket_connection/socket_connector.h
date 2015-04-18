@@ -16,6 +16,9 @@
 #include <vector>
 #include <sys/select.h>
 #include <socket_connection/socket_listener.h>
+
+
+namespace socket_connection{
 /**
  * @brief The SocketConnector class A class that holds basic unix stuff for socket-connection
  */
@@ -95,12 +98,12 @@ public:
      * @param bytesToSend
      * @return
      */
-    bool sendMessage(const void *buffer, int bytesToSend,bool addSize = false);
+    bool sendMessage(const void *buffer, int bytesToSend,bool addSize = true);
     /**
      * @brief setSocketListener listener that is called by SocketClient and SocketServer on events
      * @param listener
      */
-    void setSocketListener(SocketListener *listener);
+    virtual void setSocketListener(SocketListener *listener);
     /**
      * @brief getSocketListener listener that is called by SocketClient and SocketServer on events
      * @return
@@ -108,5 +111,5 @@ public:
     SocketListener *getSocketListener();
 
 };
-
+}
 #endif /* SOCKET_CONNECTOR_H */

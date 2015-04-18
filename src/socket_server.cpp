@@ -23,6 +23,7 @@
 #include <sys/select.h>
 #include "socket_connection/socket_server.h"
 
+namespace socket_connection{
 #define TRUE   1
 /*
  * http://linux.die.net/man/3/fd_set
@@ -123,18 +124,24 @@ void SocketServer::checkNewMessages(){
 			it != clients.end(); ++it) {
         SocketConnector &client = *it;
         if (FD_ISSET(client.getFileDescriptor(), &fds)) {
-            n = read(client.getFileDescriptor(), client.getReceiver().getReadBuffer(), client.getReceiver().getBufferSpace());
+            n = read(client.getFileDescriptor(), client.getReceiver().getWriteBuffer(), client.getReceiver().getBufferSpace());
 			if (n <= 0) {
                 //Somebody disconnected, remove client
                 logger.info("check messages") << "client disconnected";
 				it = clients.erase(it) - 1;
 			} else {
-                logger.info("check messages")<<"Server received message:" << client.getReceiver().getReadStart();
-                //TODO listener
-                char ans[] = "Got your message";
-                client.sendMessage(ans,sizeof(ans),true);
-			}
-		}
+                std::cout <<"here";
+                logger.info("check messages")<<"Server bytes"<<n<<"received message:" << client.getReceiver().getReadBuffer();
+
+                std::cout <<"here" <<std::endl;
+                client.getReceiver().addedBytes(n);
+                if(getSocketListener() != nullptr){
+                    while(client.getReceiver().receivedMessage()){
+                        getSocketListener()->receivedMessage(client,client.getReceiver().getLastReadPointer(),client.getReceiver().getLastReadCount());
+                    }
+                }
+            }
+        }
 	}
 }
 
@@ -143,9 +150,6 @@ void SocketServer::addClient(SocketConnector &client) {
     if(getSocketListener() != nullptr){
         getSocketListener()->connected(client);
     }
-    char msg[] = "Ene mene muh da hast dich registriert du kuh";
-    client.sendMessage(msg,sizeof(msg));
-    //Maybe send welcome-message
 }
 
 void SocketServer::sendMessageToAllClients(const void *buffer, int bytesToSend){
@@ -160,4 +164,5 @@ void SocketServer::close(){
     for(auto &client:clients){
         client.close();
     }
+}
 }

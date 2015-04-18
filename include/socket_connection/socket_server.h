@@ -5,6 +5,8 @@
 #include <netinet/in.h>
 #include <lms/logger.h>
 #include <socket_connection/socket_connector.h>
+
+namespace socket_connection{
 class SocketServer:public SocketConnector {
 
 public:
@@ -53,5 +55,5 @@ public:
      */
     void close();
 };
-
+}
 #endif /*SOCKET_SERVER_H */

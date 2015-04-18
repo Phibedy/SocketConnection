@@ -10,6 +10,7 @@
 #include <socket_connection/socket_connector.h>
 #include <string>
 
+namespace socket_connection{
 SocketClient::SocketClient(lms::logging::Logger *parentLogger):logger("SocketClient",parentLogger){
     SocketClient::listener = nullptr;
 }
@@ -73,12 +74,13 @@ void SocketClient::checkNewMessages(){
                 logger.perror("checkNewMessages: ") << n;
                 //it = servers.erase(it) - 1;
             } else {
+               // logger.info()
+                server.getReceiver().addedBytes(n);
                 if(getSocketListener() != nullptr){
-                    while(server.getReceiver().receivedMessage(n)){
-                        getSocketListener()->receivedMessage(server,server.getReceiver().getReadStart(),server.getReceiver().getLastReadCount());
+                    while(server.getReceiver().receivedMessage()){
+                        getSocketListener()->receivedMessage(server,server.getReceiver().getLastReadPointer(),server.getReceiver().getLastReadCount());
                     }
                 }
-                logger.debug("check messages") <<"Client received message";
             }
         }
     }
@@ -99,7 +101,7 @@ bool SocketClient::listenToFiles() {
                 max_fd = server.getFileDescriptor();
             }
         } else {
-            //remove invalid client
+            //remove invalid servers
             logger.info("listenToFiles") <<"invalid server file";
             server.setConnected(false);
             //not sure if that method should be called
@@ -112,4 +114,17 @@ bool SocketClient::listenToFiles() {
     bzero(&timeout,sizeof(timeout));
 
     return select(max_fd+1, &fds, NULL, NULL, &timeout) > 0;
+}
+
+void SocketClient::sendMessageToAllServers(const void *buffer, int bytesToSend, bool addSize){
+    for(SocketConnector &sc: servers){
+        sc.sendMessage(buffer,bytesToSend,addSize);
+    }
+}
+
+
+void SocketClient::setSocketListener(SocketListener *listener){
+    SocketConnector::setSocketListener(listener);
+}
+
 }

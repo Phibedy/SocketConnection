@@ -1,52 +1,89 @@
 #include <socket_connection/receiver.h>
-Receiver::Receiver():bytesForSize(4),lastRead(0){
+#include <iostream>
+
+namespace socket_connection{
+Receiver::Receiver():bytesForSize(4),bufferIndexRead(0),bufferIndexWrite(0),lastReadByteCount(0){
 }
 
 
 char* Receiver::getReadBuffer(){
-    return &buffer[currentBufferIndex];
+    return &buffer[bufferIndexRead];
 }
 
-bool Receiver::receivedMessage(int bytesRead){
+char* Receiver::getWriteBuffer(){
+    return &buffer[bufferIndexWrite];
+}
+
+void Receiver::addedBytes(int bytesAdded){
+    bufferIndexWrite += bytesAdded;
+}
+
+
+bool Receiver::receivedMessage(){
+    std::cout << "#########################" << std::endl;
     //number of bytes available atm
+    int bytesAvailable = bufferIndexWrite-bufferIndexRead;
     if(bytesForSize == 0){
-        if(bytesRead > 0){
-            lastRead = bytesRead;
+        if(bytesAvailable> 0){
+            lastReadByteCount = bytesAvailable;
+            lastReadPointer = &buffer[bufferIndexRead];
             return true;
         }
     }
-    int totalBytes = currentBufferIndex+bytesRead;
+    std::cout << "current bufferIndexRead: " <<bufferIndexRead <<std::endl;
     /*
      * check if you try to read more bytes then the size of the buffer
      * Maybe not that usefull as their might be a segfault before
      */
-    if(totalBytes > bufferSize){
+    if(bytesAvailable > bufferSize){
         //TODO error-handling
+        return false;
     }
-    while (totalBytes > bytesForSize){
+    if (bytesAvailable > bytesForSize){
         //get the size
         std::uint32_t size = 0;
         memcpy(&size,buffer,bytesForSize);
-        if(size > bytesRead-bytesForSize){
+        std::cout << "bytesAvailable: " << bytesAvailable << " bytesNeeded " << size <<std::endl;
+        if(size > bytesAvailable-bytesForSize){
             //packet doesn't fit, wait for more data
-            currentBufferIndex = totalBytes;
+            std::cout << "packet doesn't fit, wait for more data" << std::endl;
             return false;
         }
-        //throw event
-        lastRead = size;
-        //one complete object was read, decrease the bufferIndex
-        currentBufferIndex -= bytesForSize+size;
+        //data package is valid, it could be parsed
+        //set values for reading the bufferpart afterwards
+        lastReadByteCount = size;
+        lastReadPointer = &buffer[bufferIndexRead];
+        //set the new index that will be used for reading the next part
+        bufferIndexRead += size + bytesForSize;
+        //check if the bufferIndecies can be reset
+        if(bufferIndexRead == bufferIndexWrite){
+            bufferIndexRead = 0;
+            bufferIndexWrite = 0;
+            std::cout << "bufferindices are the same"<<std::endl;
+
+        }
+        if(bufferIndexRead > bufferSize*0.75){
+            //TODO copy buffer to start
+            memcpy(buffer,&buffer[bufferIndexRead],bufferIndexWrite - bufferIndexRead);
+        }
+        std::cout << "set current bufferindex: " << bufferIndexRead <<std::endl;
         return true;
     }
+    return false;
+}
+
+bool Receiver::receivedMessage(int bytesRead){
+    addedBytes(bytesRead);
+    return receivedMessage();
 }
 
 
-char * Receiver::getReadStart(){
-    return &buffer[bytesForSize];
+char * Receiver::getLastReadPointer(){
+    return lastReadPointer;
 }
 
 int Receiver::getLastReadCount(){
-    return lastRead;
+    return lastReadByteCount;
 }
 
 void Receiver::setBuffer(char *buffer, int size){
@@ -63,5 +100,6 @@ void Receiver::setBytesForSize(int size){
 }
 
 int Receiver::getBufferSpace(){
-    return bufferSize-currentBufferIndex;
+    return bufferSize-bufferIndexWrite;
+}
 }
