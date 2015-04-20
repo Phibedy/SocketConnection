@@ -3,7 +3,8 @@
 #include <arpa/inet.h>    //close
 
 namespace socket_connection{
-SocketConnector::SocketConnector(int bufferSize):connected(false),bufferSize(bufferSize),
+int SocketConnector::iDCounter = 0;
+SocketConnector::SocketConnector(int bufferSize):iD(iDCounter++),connected(false),bufferSize(bufferSize),
     fileDescriptor(0),listener(nullptr),address(""),port(0){
     /*
      * set server_addr to zero
@@ -15,7 +16,7 @@ SocketConnector::SocketConnector(int bufferSize):connected(false),bufferSize(buf
     receiver.setBuffer(new char[bufferSize], bufferSize);
 }
 
-Receiver SocketConnector::getReceiver(){
+Receiver& SocketConnector::getReceiver(){
     return receiver;
 }
 
@@ -72,5 +73,9 @@ SocketListener* SocketConnector::getSocketListener(){
 void SocketConnector::close(){
     setConnected(false);
     //close(getFileDescriptor());
+}
+
+int SocketConnector::getID() const{
+    return iD;
 }
 }

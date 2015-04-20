@@ -20,13 +20,14 @@ void Receiver::addedBytes(int bytesAdded){
 
 
 bool Receiver::receivedMessage(){
-    std::cout << "#########################" << std::endl;
+    std::cout << "######################### bufWrite: " <<bufferIndexWrite << std::endl;
     //number of bytes available atm
     int bytesAvailable = bufferIndexWrite-bufferIndexRead;
     if(bytesForSize == 0){
         if(bytesAvailable> 0){
             lastReadByteCount = bytesAvailable;
             lastReadPointer = &buffer[bufferIndexRead];
+            std::cout << "return true 1" << std::endl;
             return true;
         }
     }
@@ -52,7 +53,7 @@ bool Receiver::receivedMessage(){
         //data package is valid, it could be parsed
         //set values for reading the bufferpart afterwards
         lastReadByteCount = size;
-        lastReadPointer = &buffer[bufferIndexRead];
+        lastReadPointer = &buffer[bufferIndexRead+bytesForSize];
         //set the new index that will be used for reading the next part
         bufferIndexRead += size + bytesForSize;
         //check if the bufferIndecies can be reset
@@ -68,6 +69,8 @@ bool Receiver::receivedMessage(){
         }
         std::cout << "set current bufferindex: " << bufferIndexRead <<std::endl;
         return true;
+    }else{
+        std::cout<<"not enough bytes for size (>): bAvail | bForSize: " << bytesAvailable << " | " << bytesForSize << std::endl;
     }
     return false;
 }

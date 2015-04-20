@@ -15,7 +15,7 @@ public:
      * @param buff
      * @param bytesRead
      */
-    virtual void receivedMessage(const SocketConnector &from, char* buff, int bytesRead)=0;
+    virtual void receivedMessage(SocketConnector &from, char* buff, int bytesRead)=0;
     /**
      * @brief disconnected called if connection was closed
      * @param disconnected

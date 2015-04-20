@@ -113,8 +113,7 @@ void SocketServer::checkNewConnections() {
             logger.error("new Connection") << "failed accept";
 		}
         newClient.setConnected(true);
-		addClient(newClient);
-        logger.info("new Connection") <<"client connected";
+        addClient(newClient);
 	}
 }
 
@@ -129,11 +128,8 @@ void SocketServer::checkNewMessages(){
                 //Somebody disconnected, remove client
                 logger.info("check messages") << "client disconnected";
 				it = clients.erase(it) - 1;
-			} else {
-                std::cout <<"here";
+            } else {
                 logger.info("check messages")<<"Server bytes"<<n<<"received message:" << client.getReceiver().getReadBuffer();
-
-                std::cout <<"here" <<std::endl;
                 client.getReceiver().addedBytes(n);
                 if(getSocketListener() != nullptr){
                     while(client.getReceiver().receivedMessage()){

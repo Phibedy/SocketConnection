@@ -23,6 +23,8 @@ namespace socket_connection{
  * @brief The SocketConnector class A class that holds basic unix stuff for socket-connection
  */
 class SocketConnector{
+    static int iDCounter;
+    int iD;
     bool connected;
     Receiver receiver;
 
@@ -70,7 +72,7 @@ public:
      * @brief getReceiver the buffer-wrapper to receive messages
      * @return
      */
-    Receiver getReceiver();
+    Receiver& getReceiver();
 
     /**
      * @brief setFileDescriptor used to receive and send messages
@@ -109,6 +111,8 @@ public:
      * @return
      */
     SocketListener *getSocketListener();
+
+    int getID() const;
 
 };
 }
