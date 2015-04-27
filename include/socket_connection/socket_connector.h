@@ -50,9 +50,9 @@ public:
     socklen_t adress_length;
     /**
      * @brief SocketConnector
-     * @param buffersize by default 1024
+     * @param buffersize by default 1024000
      */
-    SocketConnector(int buffersize = 1024);
+    SocketConnector(int buffersize = 1024000);
     /** Just for later handling, not required by the system*/
     std::string address;
     /** Just for later handling, not required by the system*/

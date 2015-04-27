@@ -91,6 +91,10 @@ public:
      * @param size
      */
     void setBytesForSize(int size);
+    /**
+     * @brief getBufferSpace
+     * @return space left in the buffer
+     */
     int getBufferSpace();
 
 

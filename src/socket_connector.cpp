@@ -24,7 +24,6 @@ bool SocketConnector::isConnected(){
     return connected;
 }
 
-
 int SocketConnector::getFileDescriptor(){
     return fileDescriptor;
 }

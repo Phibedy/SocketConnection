@@ -68,7 +68,7 @@ void SocketClient::checkNewMessages(){
         }
         if (FD_ISSET(server.getFileDescriptor(), &fds)) {
 
-            n = read(server.getFileDescriptor(), server.getReceiver().getWriteBuffer(), 256);
+            n = read(server.getFileDescriptor(), server.getReceiver().getWriteBuffer(), server.getReceiver().getBufferSpace());
             if (n <= 0) {
                 //Server closed connection
                 logger.perror("checkNewMessages: ") << n;
