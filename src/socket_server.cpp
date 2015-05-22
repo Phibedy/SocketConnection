@@ -67,6 +67,8 @@ void SocketServer::start(int port) {
 		perror("listen");
 		exit (EXIT_FAILURE);
 	}
+
+    logger.info("Server started: port:") <<port;
 }
 
 void SocketServer::cycle() {
