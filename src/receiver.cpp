@@ -45,7 +45,8 @@ bool Receiver::receivedMessage(){
         std::uint32_t size = 0;
         memcpy(&size,buffer,bytesForSize);
         std::cout << "bytesAvailable: " << bytesAvailable << " bytesNeeded " << size <<std::endl;
-        if(size > bytesAvailable-bytesForSize){
+        int av = bytesAvailable-bytesForSize;
+        if(av < 0 || size > (uint) bytesAvailable-bytesForSize){
             //packet doesn't fit, wait for more data
             std::cout << "packet doesn't fit, wait for more data" << std::endl;
             return false;
