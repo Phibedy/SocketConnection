@@ -20,7 +20,7 @@ void Receiver::addedBytes(int bytesAdded){
 
 
 bool Receiver::receivedMessage(){
-    std::cout << "######################### bufWrite: " <<bufferIndexWrite << std::endl;
+    //std::cout << "######################### bufWrite: " <<bufferIndexWrite << std::endl;
     //number of bytes available atm
     int bytesAvailable = bufferIndexWrite-bufferIndexRead;
     if(bytesForSize == 0){
@@ -43,12 +43,12 @@ bool Receiver::receivedMessage(){
     if (bytesAvailable > bytesForSize){
         //get the size
         std::uint32_t size = 0;
-        memcpy(&size,buffer,bytesForSize);
-        std::cout << "bytesAvailable: " << bytesAvailable << " bytesNeeded " << size <<std::endl;
+        memcpy(&size,&buffer[bufferIndexRead],bytesForSize);
+        //std::cout << "bytesAvailable: " << bytesAvailable << " bytesNeeded " << size <<std::endl;
         int av = bytesAvailable-bytesForSize;
         if(av < 0 || size > (uint) bytesAvailable-bytesForSize){
             //packet doesn't fit, wait for more data
-            std::cout << "packet doesn't fit, wait for more data" << std::endl;
+            //std::cout << "packet doesn't fit, wait for more data" << std::endl;
             return false;
         }
         //data package is valid, it could be parsed
@@ -62,16 +62,16 @@ bool Receiver::receivedMessage(){
             bufferIndexRead = 0;
             bufferIndexWrite = 0;
             std::cout << "bufferindices are the same"<<std::endl;
-
         }
         if(bufferIndexRead > bufferSize*0.75){
             //TODO copy buffer to start
+            //std::cout << "Copy buffer: startindex: "<< bufferIndexRead << " bytesToCopy: "<<bufferIndexWrite - bufferIndexRead<<std::endl;
             memcpy(buffer,&buffer[bufferIndexRead],bufferIndexWrite - bufferIndexRead);
         }
-        std::cout << "set current bufferindex: " << bufferIndexRead <<std::endl;
+        //std::cout << "set current bufferindex: " << bufferIndexRead <<std::endl;
         return true;
     }else{
-        std::cout<<"not enough bytes for size (>): bAvail | bForSize: " << bytesAvailable << " | " << bytesForSize << std::endl;
+        //std::cout<<"not enough bytes for size (>): bAvail | bForSize: " << bytesAvailable << " | " << bytesForSize << std::endl;
     }
     return false;
 }
