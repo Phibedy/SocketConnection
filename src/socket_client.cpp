@@ -12,7 +12,7 @@
 
 namespace socket_connection{
 SocketClient::SocketClient(lms::logging::Logger *parentLogger):logger("SocketClient",parentLogger){
-    SocketClient::listener = nullptr;
+    //SocketClient::listener = nullptr;
 }
 
 bool SocketClient::connectToServer(std::string address, int port){
@@ -38,11 +38,12 @@ bool SocketClient::connectToServer(std::string address, int port){
     //set socket_addr
     server.socket_addr.sin_family = AF_INET;
     bcopy((char *) hostent->h_addr, (char *) &server.socket_addr.sin_addr.s_addr,
-            hostent->h_length);
+          hostent->h_length);
     server.socket_addr.sin_port = htons(port);
     //connect to server
     if (connect(server.getFileDescriptor(), (struct sockaddr *) &(server.socket_addr), server.adress_length) < 0){
         logger.perror("ERROR connecting");
+        server.close();
         return false;
     }
     server.setConnected(true);
@@ -60,9 +61,8 @@ void SocketClient::cycleClient(){
 
 void SocketClient::checkNewMessages(){
     int n = 0;
-    for (std::vector<SocketConnector>::iterator it = servers.begin();
-            it != servers.end(); ++it) {
-        SocketConnector & server = *it;
+    for (int i = 0;i < (int) servers.size();i++) {
+        SocketConnector & server = servers[i];
         if(!server.isConnected()){
             continue;
         }
@@ -72,9 +72,12 @@ void SocketClient::checkNewMessages(){
             if (n <= 0) {
                 //Server closed connection
                 logger.perror("checkNewMessages: ") << n;
+                getSocketListener()->disconnected(server);
+                servers.erase(servers.begin()+i);
+                i--;
                 //it = servers.erase(it) - 1;
             } else {
-               // logger.info()
+                // logger.info()
                 server.getReceiver().addedBytes(n);
                 if(getSocketListener() != nullptr){
                     while(server.getReceiver().receivedMessage()){
@@ -91,7 +94,7 @@ bool SocketClient::listenToFiles() {
     FD_ZERO(&fds);
     //listen to all servers
     for (std::vector<SocketConnector>::iterator it = servers.begin();
-            it != servers.end(); ++it) {
+         it != servers.end(); ++it) {
         SocketConnector &server = *it;
         //if valid socket descriptor then add to read list
         if (server.getFileDescriptor() > 0) {
@@ -107,6 +110,7 @@ bool SocketClient::listenToFiles() {
             //not sure if that method should be called
             if(getSocketListener() != nullptr){
                 getSocketListener()->disconnected(server);
+                server.close();
             }
         }
     }
@@ -117,6 +121,7 @@ bool SocketClient::listenToFiles() {
 }
 
 void SocketClient::sendMessageToAllServers(const void *buffer, int bytesToSend, bool addSize){
+    logger.info("sendMessageToAllServers") <<"serverCount: " << servers.size();
     for(SocketConnector &sc: servers){
         sc.sendMessage(buffer,bytesToSend,addSize);
     }

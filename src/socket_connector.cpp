@@ -71,7 +71,7 @@ SocketListener* SocketConnector::getSocketListener(){
 
 void SocketConnector::close(){
     setConnected(false);
-    //close(getFileDescriptor());
+    ::close(getFileDescriptor());
 }
 
 int SocketConnector::getID() const{

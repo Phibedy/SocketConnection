@@ -20,7 +20,7 @@ private:
 
     lms::logging::ChildLogger logger;
     std::vector<SocketConnector> servers;
-    SocketListener* listener;
+    //SocketListener* listener;
     /**
      * @brief listenToFiles listens to all files, returns true if data was written into a file
      * @return
