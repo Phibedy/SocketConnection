@@ -19,6 +19,13 @@ void Receiver::addedBytes(int bytesAdded){
 }
 
 
+void Receiver::reset(){
+    bufferIndexRead = 0;
+    bufferIndexWrite = 0;
+    lastReadByteCount = 0;
+    lastReadPointer = nullptr;
+}
+
 bool Receiver::receivedMessage(){
     //std::cout << "######################### bufWrite: " <<bufferIndexWrite << std::endl;
     //number of bytes available atm
@@ -60,7 +67,6 @@ bool Receiver::receivedMessage(){
         if(bufferIndexRead == bufferIndexWrite){
             bufferIndexRead = 0;
             bufferIndexWrite = 0;
-            std::cout << "bufferindices are the same"<<std::endl;
         }
         if(bufferIndexRead > bufferSize*0.75){
             //TODO copy buffer to start

@@ -32,6 +32,8 @@ private:
     void checkNewMessages();
 
 public:
+
+    void reset();
     /**
      * @brief connectToServer
      * @param address

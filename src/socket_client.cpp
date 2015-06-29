@@ -11,6 +11,14 @@
 #include <string>
 
 namespace socket_connection{
+
+void SocketClient::reset(){
+    setSocketListener(nullptr);
+    setConnected(false);
+    getReceiver().reset();
+    servers.clear();
+}
+
 SocketClient::SocketClient(lms::logging::Logger *parentLogger):logger("SocketClient",parentLogger){
     //SocketClient::listener = nullptr;
 }

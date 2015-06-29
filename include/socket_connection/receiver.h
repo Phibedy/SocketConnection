@@ -40,6 +40,8 @@ class Receiver {
 public:
     Receiver();
 
+    void reset();
+
     /**
      * @brief getReadBuffer
      * @return the buffer at the current position for reading
