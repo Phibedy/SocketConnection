@@ -31,7 +31,6 @@ bool Receiver::receivedMessage(){
             return true;
         }
     }
-    std::cout << "current bufferIndexRead: " <<bufferIndexRead <<std::endl;
     /*
      * check if you try to read more bytes then the size of the buffer
      * Maybe not that usefull as their might be a segfault before
@@ -68,10 +67,7 @@ bool Receiver::receivedMessage(){
             //std::cout << "Copy buffer: startindex: "<< bufferIndexRead << " bytesToCopy: "<<bufferIndexWrite - bufferIndexRead<<std::endl;
             memcpy(buffer,&buffer[bufferIndexRead],bufferIndexWrite - bufferIndexRead);
         }
-        //std::cout << "set current bufferindex: " << bufferIndexRead <<std::endl;
         return true;
-    }else{
-        //std::cout<<"not enough bytes for size (>): bAvail | bForSize: " << bytesAvailable << " | " << bytesForSize << std::endl;
     }
     return false;
 }
