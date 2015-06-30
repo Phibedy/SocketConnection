@@ -31,6 +31,11 @@ namespace socket_connection{
 SocketServer::SocketServer(lms::logging::Logger *parentLogger):logger("SocketServer",parentLogger) {
 }
 
+
+bool SocketServer::hasClients(){
+    return clients.size() > 0;
+}
+
 void SocketServer::start(int port) {
     //set default values
     SocketServer::port = port;

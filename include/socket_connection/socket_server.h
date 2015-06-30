@@ -39,6 +39,8 @@ private:
      */
     void addClient(SocketConnector &client);
 public:
+
+    bool hasClients();
     /**
      * @brief start opens the port
      * TODO My be moved to the constructor
