@@ -47,7 +47,7 @@ public:
      * @param port
      */
     void start(int port);
-    void sendMessageToAllClients(const void *buffer, int bytesToSend);
+    void sendMessageToAllClients(const void *buffer, int bytesToSend,bool addBytes = true);
     /**
      * @brief cycle call this method to check for new clients and messages
      */

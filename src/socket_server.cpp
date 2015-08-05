@@ -155,9 +155,9 @@ void SocketServer::addClient(SocketConnector &client) {
     }
 }
 
-void SocketServer::sendMessageToAllClients(const void *buffer, int bytesToSend){
+void SocketServer::sendMessageToAllClients(const void *buffer, int bytesToSend,bool addBytes){
     for(auto &client:clients){
-        client.sendMessage(buffer,bytesToSend);
+        client.sendMessage(buffer,bytesToSend,addBytes);
     }
 }
 
