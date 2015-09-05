@@ -13,3 +13,4 @@ set ( HEADERS
 )
 
 add_library ( socket_connection SHARED ${SOURCE} ${HEADERS})
+target_link_libraries( socket_connection PRIVATE lmscore )
