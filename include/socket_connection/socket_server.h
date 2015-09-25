@@ -10,12 +10,12 @@ namespace socket_connection{
 class SocketServer:public SocketConnector {
 
 public:
-    SocketServer(lms::logging::Logger *parentLogger);
+    SocketServer(lms::logging::Logger &logger);
     //char buffer[1000*100];
 
 private:
 
-    lms::logging::ChildLogger logger;
+    lms::logging::Logger &logger;
 
     std::vector<SocketConnector> clients;
 

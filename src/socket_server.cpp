@@ -28,7 +28,7 @@ namespace socket_connection{
 /*
  * http://linux.die.net/man/3/fd_set
  */
-SocketServer::SocketServer(lms::logging::Logger *parentLogger):logger("SocketServer",parentLogger) {
+SocketServer::SocketServer(lms::logging::Logger &logger): logger(logger) {
 }
 
 

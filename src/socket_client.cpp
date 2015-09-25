@@ -19,7 +19,7 @@ void SocketClient::reset(){
     servers.clear();
 }
 
-SocketClient::SocketClient(lms::logging::Logger *parentLogger):logger("SocketClient",parentLogger){
+SocketClient::SocketClient(lms::logging::Logger &logger):logger(logger){
     //SocketClient::listener = nullptr;
 }
 

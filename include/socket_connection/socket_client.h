@@ -15,10 +15,10 @@ namespace socket_connection{
 class SocketClient:public SocketConnector {
 
 public:
-    SocketClient(lms::logging::Logger *parentLogger);
+    SocketClient(lms::logging::Logger &logger);
 private:
 
-    lms::logging::ChildLogger logger;
+    lms::logging::Logger &logger;
     std::vector<SocketConnector> servers;
     //SocketListener* listener;
     /**
