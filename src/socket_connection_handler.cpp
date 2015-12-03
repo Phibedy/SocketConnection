@@ -37,7 +37,7 @@ bool SocketConnectionHandler::hasConnections(){
     return connections.size() > 0;
 }
 
-void SocketConnectionHandler::start(int port) {
+void SocketConnectionHandler::openPortForRequests(int port) {
     //set default values
     SocketConnectionHandler::port = port;
 	/*
@@ -142,6 +142,7 @@ void SocketConnectionHandler::checkNewMessages(){
                 client.getReceiver().addedBytes(n);
                 if(getSocketListener() != nullptr){
                     while(client.getReceiver().receivedMessage()){
+                        logger.error("RECEIVED MESSAGE");
                         getSocketListener()->receivedMessage(client,client.getReceiver().getLastReadPointer(),client.getReceiver().getLastReadCount());
                     }
                 }
@@ -152,6 +153,7 @@ void SocketConnectionHandler::checkNewMessages(){
 
 void SocketConnectionHandler::addConnection(SocketConnector &client) {
     connections.push_back(client);
+    logger.info("addConnection") << "client connected";
     if(getSocketListener() != nullptr){
         getSocketListener()->connected(client);
     }

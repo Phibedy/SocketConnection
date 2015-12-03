@@ -99,17 +99,6 @@ public:
      * @return
      */
     bool sendMessage(const void *buffer, int bytesToSend,bool addSize = true);
-    /**
-     * @brief setSocketListener listener that is called by SocketClient and SocketServer on events
-     * @param listener
-     */
-    virtual void setSocketListener(SocketListener *listener);
-    /**
-     * @brief getSocketListener listener that is called by SocketClient and SocketServer on events
-     * @return
-     */
-    SocketListener *getSocketListener();
-
     int getID() const;
 
 };

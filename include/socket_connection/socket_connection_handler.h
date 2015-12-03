@@ -52,10 +52,10 @@ public:
     bool hasConnections();
     /**
      * @brief start opens the port
-     * TODO My be moved to the constructor
+     * TODO only one port is available atm
      * @param port
      */
-    void start(int port);
+    void openPortForRequests(int port);
     void sendMessageToAllConnections(const void *buffer, int bytesToSend,bool addBytes = true);
 
 
