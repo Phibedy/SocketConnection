@@ -40,8 +40,6 @@ protected:
      * file descriptor set
      */
     fd_set fds;
-
-    SocketListener *listener;
 public:
     struct sockaddr_in socket_addr;
     /**

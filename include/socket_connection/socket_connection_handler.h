@@ -7,17 +7,19 @@
 #include <socket_connection/socket_connector.h>
 
 namespace socket_connection{
-class SocketServer:public SocketConnector {
+class SocketConnectionHandler:public SocketConnector {
 
 public:
-    SocketServer(lms::logging::Logger &logger);
+    SocketConnectionHandler(lms::logging::Logger &logger);
     //char buffer[1000*100];
 
 private:
 
+    SocketListener *listener;
+
     lms::logging::Logger &logger;
 
-    std::vector<SocketConnector> clients;
+    std::vector<SocketConnector> connections;
 
     /**
      * TODO same as in client
@@ -37,25 +39,42 @@ private:
      * @brief addClient adds a client
      * @param client
      */
-    void addClient(SocketConnector &client);
+    void addConnection(SocketConnector &client);
 public:
+    /**
+     * @brief connectToSocket
+     * @param address
+     * @param port
+     * @return true if the connecting was successfull
+     */
+    bool connectToSocket(std::string address,int port);
 
-    bool hasClients();
+    bool hasConnections();
     /**
      * @brief start opens the port
      * TODO My be moved to the constructor
      * @param port
      */
     void start(int port);
-    void sendMessageToAllClients(const void *buffer, int bytesToSend,bool addBytes = true);
+    void sendMessageToAllConnections(const void *buffer, int bytesToSend,bool addBytes = true);
+
+
+    void setSocketListener(SocketListener *listener);
+
+    SocketListener* getSocketListener();
+
     /**
      * @brief cycle call this method to check for new clients and messages
      */
     void cycle();
+
+
+    void reset();
     /**
      * @brief close closes the server and all related connections
      */
     void close();
+    void closeConnections();
 };
 }
 #endif /*SOCKET_SERVER_H */

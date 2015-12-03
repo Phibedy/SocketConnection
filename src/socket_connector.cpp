@@ -5,7 +5,7 @@
 namespace socket_connection{
 int SocketConnector::iDCounter = 0;
 SocketConnector::SocketConnector(int bufferSize):iD(iDCounter++),connected(false),bufferSize(bufferSize),
-    fileDescriptor(0),listener(nullptr),address(""),port(0){
+    fileDescriptor(0),address(""),port(0){
     /*
      * set server_addr to zero
      */
@@ -58,15 +58,6 @@ bool SocketConnector::sendMessage(const void *buffer, int bytesToSend, bool addS
     }
 
 }
-
-void SocketConnector::setSocketListener(SocketListener *listener){
-    this->listener = listener;
-}
-
-SocketListener* SocketConnector::getSocketListener(){
-    return listener;
-}
-
 
 void SocketConnector::close(){
     setConnected(false);
