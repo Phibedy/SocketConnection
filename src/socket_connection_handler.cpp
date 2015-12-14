@@ -142,7 +142,6 @@ void SocketConnectionHandler::checkNewMessages(){
                 client.getReceiver().addedBytes(n);
                 if(getSocketListener() != nullptr){
                     while(client.getReceiver().receivedMessage()){
-                        logger.error("RECEIVED MESSAGE");
                         getSocketListener()->receivedMessage(client,client.getReceiver().getLastReadPointer(),client.getReceiver().getLastReadCount());
                     }
                 }
