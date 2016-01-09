@@ -74,7 +74,7 @@ void SocketConnectionHandler::openPortForRequests(int port) {
 		exit (EXIT_FAILURE);
 	}
 
-    logger.info("Server started: port:") <<port;
+    logger.debug("Server started: port:") <<port;
 }
 
 void SocketConnectionHandler::cycle() {
@@ -135,10 +135,13 @@ void SocketConnectionHandler::checkNewMessages(){
             n = read(client.getFileDescriptor(), client.getReceiver().getWriteBuffer(), client.getReceiver().getBufferSpace());
 			if (n <= 0) {
                 //Somebody disconnected, remove client
-                logger.info("check messages") << "client disconnected";
+                logger.debug("check messages") << "client disconnected";
+                if(getSocketListener() != 0){
+                    getSocketListener()->disconnected(client);
+                }
                 it = connections.erase(it) - 1;
             } else {
-                logger.info("check messages")<<"Server bytes"<<n<<"received message:" << client.getReceiver().getReadBuffer();
+                logger.debug("check messages")<<"Server bytes"<<n<<"received message:" << client.getReceiver().getReadBuffer();
                 client.getReceiver().addedBytes(n);
                 if(getSocketListener() != nullptr){
                     while(client.getReceiver().receivedMessage()){
@@ -152,7 +155,7 @@ void SocketConnectionHandler::checkNewMessages(){
 
 void SocketConnectionHandler::addConnection(SocketConnector &client) {
     connections.push_back(client);
-    logger.info("addConnection") << "client connected";
+    logger.debug("addConnection") << "client connected";
     if(getSocketListener() != nullptr){
         getSocketListener()->connected(client);
     }
