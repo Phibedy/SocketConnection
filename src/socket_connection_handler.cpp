@@ -73,7 +73,6 @@ void SocketConnectionHandler::openPortForRequests(int port) {
 		perror("listen");
 		exit (EXIT_FAILURE);
 	}
-
     logger.debug("Server started: port:") <<port;
 }
 
@@ -89,7 +88,12 @@ bool SocketConnectionHandler::listenToFiles() {
     int max_fd = getFileDescriptor();
     FD_ZERO(&fds);
 	//add server file socket (for adding users)
-    FD_SET(getFileDescriptor(), &fds);
+    if(getFileDescriptor() > 0){
+        FD_SET(getFileDescriptor(), &fds);
+    }else{
+        //no port opened
+        logger.debug("listenToFiles")<< "getFileDescriptor: "<<getFileDescriptor();
+    }
     //add clients
     for (std::vector<SocketConnector>::iterator it = connections.begin();
             it != connections.end(); ++it) {
@@ -102,7 +106,7 @@ bool SocketConnectionHandler::listenToFiles() {
 			}
 		} else {
 			//remove invalid client
-            logger.warn("invalid client!!!!");
+            logger.warn("listenToFiles")<< "getFileDescriptor: "<<getFileDescriptor();
             it = connections.erase(it) - 1;
 		}
     }
