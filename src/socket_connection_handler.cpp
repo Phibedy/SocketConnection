@@ -81,7 +81,6 @@ void SocketConnectionHandler::cycle() {
         checkNewConnections();
         checkNewMessages();
     }
-
 }
 
 bool SocketConnectionHandler::listenToFiles() {
