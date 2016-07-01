@@ -10,5 +10,12 @@ set ( HEADERS
 	"include/socket_connection/socket_listener.h"
 )
 
+#set compiler flags
+if((${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang") OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"))
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wreturn-type -Wpedantic ")
+endif()
+
+include_directories("include")
+
 add_library ( socket_connection SHARED ${SOURCE} ${HEADERS})
 target_link_libraries( socket_connection PRIVATE lmscore )
